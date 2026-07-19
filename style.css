@@ -6,7 +6,7 @@
    ========================================================= */
 @font-face {
   font-family: 'KlimperDisplay';
-  src: url('fonts/KindSansBold-930828404.otf') format('woff2');
+  src: url('fonts/KindSansBold-930828404.otf') format('otf');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -14,7 +14,7 @@
 
 @font-face {
   font-family: 'KlimperText';
-  src: url('fonts/KindSansRegular-930828398.otf') format('woff2');
+  src: url('fonts/KindSansRegular-930828398.otf') format('otf');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
