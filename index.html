@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#F6EFDD" />
+<title>klimper Player</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app" data-theme="weltall">
+
+  <!--
+    Hintergrund-Sterne: exakte Vektorpfade aus klimper_fruehling.svg (Figma-Export).
+    Die drei Formen (a/b/c) werden fuer beide Themes wiederverwendet und per
+    CSS eingefaerbt/positioniert. Fuer "weltall" liegt keine Vektordatei vor -
+    dort ist Position/Groesse eine Annaeherung an den Screenshot.
+  -->
+  <svg class="stars-bg" viewBox="0 0 440 956" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="440" height="956" class="stars-bg__canvas" />
+    <path class="star star--a" d="M-266.911 639.319L-61.2202 643.75L-67.754 800.728L22.0644 634.129L192.952 701.452L103.41 515.379L264.148 369.492L52.3054 402.154L-9.71867 241.076L-86.9482 402.154L-229.025 390.144L-126.703 529.704L-266.911 639.319Z" />
+    <path class="star star--b" d="M704.27 299.343L468.812 304.416L476.291 484.111L373.475 293.401L177.857 370.467L280.357 157.467L96.3574 -9.5327L338.857 27.8566L409.857 -156.533L498.263 27.8566L660.901 14.1087L543.771 173.864L704.27 299.343Z" />
+    <path class="star star--c" d="M318 503L263 732L89 686.5L253.5 827.5L126.5 1075L328.5 972L529 1114.5L448.5 900L678.5 921L539.5 762L587.5 606L406.5 686.5L318 503Z" />
+  </svg>
+
+  <header class="brand-card">
+    <img
+      class="brand-card__logo"
+      src="assets/klimper-logo-lockup.png"
+      alt="klimper – Das Klassik-Magazin für Kinder"
+      width="831"
+      height="211"
+    />
+    <h1 class="brand-card__theme" id="themeName">Weltall</h1>
+  </header>
+
+  <main class="player">
+
+    <section class="track" aria-live="polite">
+      <p class="track__eyebrow" id="trackEyebrow">Karneval der Tiere</p>
+      <h2 class="track__title" id="trackTitle">Die V&ouml;gel</h2>
+      <p class="track__composer" id="trackComposer">Camille Saint-Sa&euml;ns</p>
+    </section>
+
+    <section class="progress">
+      <div class="progress__track" id="progressTrack" role="slider" aria-label="Wiedergabeposition" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+        <div class="progress__fill" id="progressFill"></div>
+        <span class="progress__handle" id="progressHandle"></span>
+      </div>
+      <p class="progress__time" id="timeDisplay">0:00</p>
+    </section>
+
+    <section class="controls">
+      <button type="button" class="btn btn--skip" id="prevBtn" aria-label="Vorheriger Titel">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+          <path d="M18 4 L18 20 L6 12 Z" />
+        </svg>
+      </button>
+
+      <button type="button" class="btn btn--play" id="playBtn" aria-label="Abspielen">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true" id="playIcon">
+          <path d="M8 5 L19 12 L8 19 Z" />
+        </svg>
+      </button>
+
+      <button type="button" class="btn btn--skip" id="nextBtn" aria-label="N&auml;chster Titel">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+          <path d="M6 4 L6 20 L18 12 Z" />
+        </svg>
+      </button>
+    </section>
+
+  </main>
+
+  <!-- Versteckter YouTube-Player: dient nur der Audiowiedergabe, wird nie sichtbar -->
+  <div id="player" class="yt-hidden"></div>
+
+</div>
+
+<script src="app.js" defer></script>
+</body>
+</html>

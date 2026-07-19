@@ -1,0 +1,317 @@
+/* =========================================================
+   Custom Fonts (lokal, aus /fonts)
+   Platzhalter-Dateinamen – bitte durch echte Font-Dateien ersetzen.
+   Das "klimper"-Wortmarke + Tagline liegt als Bild vor (siehe
+   assets/klimper-logo-lockup.png) und braucht daher keinen Font.
+   ========================================================= */
+@font-face {
+  font-family: 'KlimperDisplay';
+  src: url('fonts/KlimperDisplay-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'KlimperText';
+  src: url('fonts/KlimperText-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =========================================================
+   Theme-Variablen
+   Sternfarben fuer "fruehling" sind 1:1 aus der Figma-Vektordatei
+   (klimper_fruehling.svg) uebernommen. Fuer "weltall" liegt keine
+   Vektordatei vor: Farben sind aus dem Screenshot abgeleitet, die
+   Sternformen selbst werden (Position/Groesse) wiederverwendet und
+   nur eingefaerbt – eine Annahme, bis eine Weltall-Vektordatei
+   vorliegt.
+   ========================================================= */
+:root {
+  --ink: #1A1A1A;
+  --card-bg: #FFFFFF;
+  --accent-red: #E7302B; /* exakt aus Logo/Steuerelementen der Vektordatei */
+  --font-display: 'KlimperDisplay', 'Arial Black', sans-serif;
+  --font-text: 'KlimperText', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+[data-theme="fruehling"] {
+  --bg: #FFFADD;
+  --star-a: #EBB6C6; /* Pink */
+  --star-b: #EF272C; /* Rot */
+  --star-c: #9FCE45; /* Gruen */
+}
+
+[data-theme="weltall"] {
+  --bg: #F6EFDD;
+  --star-a: #B7CD79; /* Oliv-Gruen (Annahme) */
+  --star-b: #1B3B73; /* Navy (Annahme) */
+  --star-c: #E8628F; /* Pink/Magenta (Annahme) */
+}
+
+/* =========================================================
+   Reset & Grundlayout
+   ========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+}
+
+.app {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================================
+   Hintergrund-Sterne
+   Exakte Vektorpfade aus der Figma-Datei (viewBox 0 0 440 956,
+   Referenzformat ca. Smartphone-Hochformat). Ueber preserveAspectRatio
+   "slice" skaliert die Grafik wie ein Hintergrundbild ueber jede
+   Viewport-Groesse, ohne die Formen zu verzerren.
+   ========================================================= */
+.stars-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.stars-bg__canvas {
+  fill: var(--bg);
+}
+
+.star--a { fill: var(--star-a); }
+.star--b { fill: var(--star-b); }
+.star--c { fill: var(--star-c); }
+
+/* =========================================================
+   Marken-Karte
+   Exakte Form aus der Vektordatei uebernommen: kein Rounded-Rect,
+   sondern ein Trapez (scharfe Ecken, schraege Unterkante).
+   Eckpunkte relativ zur Card-Box: (0% 0%, 100% 0%, 100% 86.3%, 0% 100%)
+   ========================================================= */
+.brand-card {
+  position: relative;
+  z-index: 2;
+  background: var(--card-bg);
+  margin: 0 14.8% 0;
+  padding: 20px 10% 28px;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 86.3%, 0% 100%);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.brand-card__logo {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.brand-card__theme {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(22px, 6vw, 28px);
+  color: var(--accent-red);
+}
+
+/* =========================================================
+   Player
+   ========================================================= */
+.player {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(20px, 5vh, 32px);
+  padding: 32px 19.3% 48px;
+}
+
+.track {
+  text-align: center;
+}
+
+.track__eyebrow {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(13px, 3.2vw, 15px);
+  color: var(--ink);
+}
+
+.track__title {
+  margin: 0 0 2px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(26px, 7vw, 34px);
+  color: var(--ink);
+}
+
+.track__composer {
+  margin: 0;
+  font-family: var(--font-text);
+  font-weight: 400;
+  font-size: clamp(15px, 4vw, 18px);
+  color: var(--ink);
+}
+
+/* Fortschrittsanzeige */
+.progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress__track {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.progress__track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--accent-red);
+  transform: translateY(-50%);
+  opacity: 0.35;
+}
+
+.progress__fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 2px;
+  width: 0%;
+  background: var(--accent-red);
+  transform: translateY(-50%);
+}
+
+.progress__handle {
+  position: absolute;
+  left: 0%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-red);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.progress__time {
+  margin: 0;
+  font-family: var(--font-text);
+  font-size: 15px;
+  color: var(--ink);
+}
+
+/* Steuerung */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7.3%;
+}
+
+.btn {
+  border: none;
+  background: none;
+  color: var(--accent-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn--skip {
+  width: 44px;
+  height: 44px;
+}
+
+.btn--play {
+  width: clamp(64px, 16.1vw, 84px);
+  height: clamp(64px, 16.1vw, 84px);
+  background: var(--accent-red);
+  color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 10px 24px rgba(231, 48, 43, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.btn--play:active {
+  transform: scale(0.94);
+}
+
+/* =========================================================
+   Versteckter YouTube-Player
+   ========================================================= */
+.yt-hidden,
+.yt-hidden iframe {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  left: -9999px !important;
+  bottom: -9999px !important;
+}
+
+/* =========================================================
+   Groessere Viewports: App bleibt im Telefon-Format, zentriert
+   ========================================================= */
+@media (min-width: 540px) {
+  body {
+    align-items: center;
+    padding: 32px 0;
+  }
+  .app {
+    min-height: min(880px, 92dvh);
+    border-radius: 32px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+  }
+}
