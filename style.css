@@ -120,7 +120,8 @@ body {
   position: relative;
   z-index: 2;
   background: var(--card-bg);
-  margin: 0 20% 0;
+  width: 50%;               /* Je kleiner der Prozentwert, desto schmaler die Karte */
+  margin: 0 auto;
   padding: 20px 10% 28px;
   clip-path: polygon(0% 0%, 100% 0%, 100% 86.3%, 0% 100%);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
