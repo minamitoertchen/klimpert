@@ -120,7 +120,7 @@ body {
   position: relative;
   z-index: 2;
   background: var(--card-bg);
-  width: 50%;               /* Je kleiner der Prozentwert, desto schmaler die Karte */
+  width: 70%;               /* Je kleiner der Prozentwert, desto schmaler die Karte */
   margin: 0 auto;
   padding: 20px 10% 28px;
   clip-path: polygon(0% 0%, 100% 0%, 100% 86.3%, 0% 100%);
@@ -134,6 +134,7 @@ body {
   max-width: 300px;
   height: auto;
   margin: 0 auto;
+  text-align: center;
 }
 
 .brand-card__theme {
