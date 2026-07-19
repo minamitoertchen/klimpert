@@ -126,6 +126,7 @@ body {
   clip-path: polygon(0% 0%, 100% 0%, 100% 86.3%, 0% 100%);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
   text-align: center;
+  align-items: center;
 }
 
 .brand-card__logo {
