@@ -1,36 +1,34 @@
 // =========================================================
-// klimper Player – App-Logik (Manuelle Playlists)
+// klimper Player – App-Logik (Native Audio / MP3)
 // =========================================================
 
 // ---------------------------------------------------------
-// DEINE PLAYLISTS & TRACKS (Hier eintragen!)
+// DEINE PLAYLISTS & MP3-DATEIEN
+// Lege deine MP3s in den Ordner "assets/audio/"
 // ---------------------------------------------------------
 const PLAYLISTS = {
-  // Playlist 1: Aufrufbar via ?playlist=fruehling
   fruehling: {
     themeName: 'Frühling',
     tracks: [
       {
-        id: 'nNwSgAR9uyA', // YouTube Video-ID
+        url: 'assets/audio/schwan.mp3', // Pfad zu deiner MP3-Datei
+        eyebrow: 'Karneval der Tiere',
+        title: 'Der Schwan',
+        composer: 'Camille Saint-Saëns',
+      },
+      {
+        url: 'assets/audio/voegel.mp3',
         eyebrow: 'Karneval der Tiere',
         title: 'Die Vögel',
         composer: 'Camille Saint-Saëns',
       },
-      {
-        id: '3LiztfE1X7E',
-        eyebrow: 'Die vier Jahreszeiten',
-        title: 'Der Frühling',
-        composer: 'Antonio Vivaldi',
-      },
     ],
   },
-
-  // Playlist 2: Aufrufbar via ?playlist=weltall
   weltall: {
     themeName: 'Weltall',
     tracks: [
       {
-        id: 'dQw4w9WgXcQ',
+        url: 'assets/audio/jupiter.mp3',
         eyebrow: 'Die Planeten',
         title: 'Jupiter',
         composer: 'Gustav Holst',
@@ -39,11 +37,11 @@ const PLAYLISTS = {
   },
 };
 
-// Fallback, falls kein Parameter in der URL steht
+// Fallback-Playlist, falls kein Parameter in der URL steht
 const DEFAULT_PLAYLIST_KEY = 'fruehling';
 
 // ---------------------------------------------------------
-// QR-Code Parameter auslesen & Playlist bestimmen
+// QR-Code Parameter auslesen
 // ---------------------------------------------------------
 function getPlaylistKeyFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -55,14 +53,12 @@ const currentPlaylistKey = getPlaylistKeyFromUrl();
 const activePlaylist = PLAYLISTS[currentPlaylistKey];
 
 let currentIndex = 0;
-let player = null;
-let isPlaying = false;
-let progressTimer = null;
 let isSeeking = false;
 
 // ---------------------------------------------------------
 // DOM-Referenzen
 // ---------------------------------------------------------
+const audio = document.getElementById('audioPlayer');
 const elThemeName = document.getElementById('themeName');
 const elEyebrow = document.getElementById('trackEyebrow');
 const elTitle = document.getElementById('trackTitle');
@@ -80,91 +76,19 @@ const ICON_PLAY = '<path d="M8 5 L19 12 L8 19 Z" />';
 const ICON_PAUSE = '<path d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z" />';
 
 // ---------------------------------------------------------
-// YouTube API Initialisierung
+// Audio & UI Initialisierung
 // ---------------------------------------------------------
-function loadYouTubeIframeAPI() {
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
-}
+function loadTrack(index) {
+  currentIndex = index;
+  const track = activePlaylist.tracks[currentIndex];
 
-window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    height: '1',
-    width: '1',
-    videoId: activePlaylist.tracks[currentIndex].id,
-    playerVars: {
-      autoplay: 0,
-      controls: 0,
-      disablekb: 1,
-      fs: 0,
-      modestbranding: 1,
-      playsinline: 1,
-      rel: 0,
-      iv_load_policy: 3,
-      origin: window.location.origin,
-    },
-    events: {
-      onReady: handlePlayerReady,
-      onStateChange: handleStateChange,
-    },
-  });
-};
+  audio.src = track.url;
+  audio.load();
 
-function handlePlayerReady() {
-  renderTrackUI();
-}
-
-function handleStateChange(event) {
-  isPlaying = event.data === YT.PlayerState.PLAYING;
-  renderPlayIcon();
-
-  if (isPlaying) {
-    startProgressLoop();
-  } else {
-    stopProgressLoop();
-  }
-
-  // Automatischer Wechsel zum nächsten Track bei Liedende
-  if (event.data === YT.PlayerState.ENDED) {
-    goToNext();
-  }
-}
-
-// ---------------------------------------------------------
-// Steuerung
-// ---------------------------------------------------------
-function togglePlay() {
-  if (!player || typeof player.getPlayerState !== 'function') return;
-  const state = player.getPlayerState();
-  if (state === YT.PlayerState.PLAYING) {
-    player.pauseVideo();
-  } else {
-    player.playVideo();
-  }
-}
-
-function goToNext() {
-  currentIndex = (currentIndex + 1) % activePlaylist.tracks.length;
-  loadAndPlayCurrentTrack();
-}
-
-function goToPrev() {
-  currentIndex = (currentIndex - 1 + activePlaylist.tracks.length) % activePlaylist.tracks.length;
-  loadAndPlayCurrentTrack();
-}
-
-function loadAndPlayCurrentTrack() {
   renderTrackUI();
   resetProgress();
-  if (player && typeof player.loadVideoById === 'function') {
-    player.loadVideoById(activePlaylist.tracks[currentIndex].id);
-  }
 }
 
-// ---------------------------------------------------------
-// UI Rendering & Progress Bar
-// ---------------------------------------------------------
 function renderTrackUI() {
   const track = activePlaylist.tracks[currentIndex];
   
@@ -175,10 +99,58 @@ function renderTrackUI() {
 }
 
 function renderPlayIcon() {
+  const isPlaying = !audio.paused;
   if (elPlayIcon) elPlayIcon.innerHTML = isPlaying ? ICON_PAUSE : ICON_PLAY;
   if (elPlayBtn) elPlayBtn.setAttribute('aria-label', isPlaying ? 'Pausieren' : 'Abspielen');
 }
 
+// ---------------------------------------------------------
+// Wiedergabesteuerung
+// ---------------------------------------------------------
+function togglePlay() {
+  if (audio.paused) {
+    audio.play().catch((err) => console.log('Autoplay blockiert:', err));
+  } else {
+    audio.pause();
+  }
+}
+
+function goToNext() {
+  const wasPlaying = !audio.paused;
+  const nextIndex = (currentIndex + 1) % activePlaylist.tracks.length;
+  loadTrack(nextIndex);
+  if (wasPlaying) audio.play();
+}
+
+function goToPrev() {
+  const wasPlaying = !audio.paused;
+  const prevIndex = (currentIndex - 1 + activePlaylist.tracks.length) % activePlaylist.tracks.length;
+  loadTrack(prevIndex);
+  if (wasPlaying) audio.play();
+}
+
+// ---------------------------------------------------------
+// Native Audio Events
+// ---------------------------------------------------------
+audio.addEventListener('play', renderPlayIcon);
+audio.addEventListener('pause', renderPlayIcon);
+
+// Aktualisiert den Fortschrittsbalken während der Wiedergabe
+audio.addEventListener('timeupdate', () => {
+  if (isSeeking || !audio.duration) return;
+  const ratio = audio.currentTime / audio.duration;
+  updateProgressUI(ratio, audio.currentTime);
+});
+
+// Automatischer Wechsel zum nächsten Lied am Ende
+audio.addEventListener('ended', () => {
+  goToNext();
+  audio.play();
+});
+
+// ---------------------------------------------------------
+// Fortschrittsanzeige & Spulen
+// ---------------------------------------------------------
 function formatTime(seconds) {
   if (!isFinite(seconds) || seconds < 0) return '0:00';
   const mins = Math.floor(seconds / 60);
@@ -199,34 +171,12 @@ function updateProgressUI(ratio, currentSeconds) {
   if (elTime) elTime.textContent = formatTime(currentSeconds);
 }
 
-function startProgressLoop() {
-  stopProgressLoop();
-  progressTimer = window.setInterval(() => {
-    if (isSeeking || !player || typeof player.getCurrentTime !== 'function') return;
-    const duration = player.getDuration();
-    const current = player.getCurrentTime();
-    if (!duration) return;
-    updateProgressUI(current / duration, current);
-  }, 250);
-}
-
-function stopProgressLoop() {
-  if (progressTimer) {
-    window.clearInterval(progressTimer);
-    progressTimer = null;
-  }
-}
-
-// ---------------------------------------------------------
-// Spulen (Seek) Event-Handling
-// ---------------------------------------------------------
 function seekFromClientX(clientX) {
-  if (!player || typeof player.getDuration !== 'function') return;
+  if (!audio.duration) return;
   const rect = elProgressTrack.getBoundingClientRect();
   const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-  const duration = player.getDuration();
-  updateProgressUI(ratio, ratio * duration);
-  return ratio * duration;
+  updateProgressUI(ratio, ratio * audio.duration);
+  return ratio * audio.duration;
 }
 
 if (elProgressTrack) {
@@ -244,9 +194,9 @@ if (elProgressTrack) {
   elProgressTrack.addEventListener('pointerup', (event) => {
     if (!isSeeking) return;
     isSeeking = false;
-    const target = seekFromClientX(event.clientX);
-    if (player && typeof player.seekTo === 'function' && typeof target === 'number') {
-      player.seekTo(target, true);
+    const targetTime = seekFromClientX(event.clientX);
+    if (typeof targetTime === 'number') {
+      audio.currentTime = targetTime;
     }
   });
 
@@ -255,12 +205,12 @@ if (elProgressTrack) {
   });
 }
 
-// Event-Listener für Buttons
+// ---------------------------------------------------------
+// Button Listeners
+// ---------------------------------------------------------
 if (elPlayBtn) elPlayBtn.addEventListener('click', togglePlay);
 if (elPrevBtn) elPrevBtn.addEventListener('click', goToPrev);
 if (elNextBtn) elNextBtn.addEventListener('click', goToNext);
 
-// Start
-renderTrackUI();
-renderPlayIcon();
-loadYouTubeIframeAPI();
+// Erstes Lied laden
+loadTrack(0);
