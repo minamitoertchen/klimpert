@@ -11,13 +11,13 @@ const PLAYLISTS = {
     themeName: 'Frühling',
     tracks: [
       {
-        id: 'L4u_5jC1ZGE', // YouTube Video-ID
+        id: 'nNwSgAR9uyA', // YouTube Video-ID
         eyebrow: 'Karneval der Tiere',
         title: 'Die Vögel',
         composer: 'Camille Saint-Saëns',
       },
       {
-        id: 'v2AC41dglnM',
+        id: '3LiztfE1X7E',
         eyebrow: 'Die vier Jahreszeiten',
         title: 'Der Frühling',
         composer: 'Antonio Vivaldi',
