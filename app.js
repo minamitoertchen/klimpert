@@ -1,12 +1,64 @@
 // =========================================================
-// klimper Player – App-Logik (Unterstützt YouTube Playlists)
+// klimper Player – App-Logik (Manuelle Playlists)
 // =========================================================
 
 // ---------------------------------------------------------
-// Standard-Playlist ID (Fallback, falls kein ?playlist= Parameter in der URL steht)
-// Ersetze diese ID durch deine gewünschte YouTube-Playlist-ID!
+// DEINE PLAYLISTS & TRACKS (Hier eintragen!)
 // ---------------------------------------------------------
-const DEFAULT_PLAYLIST_ID = 'PLDISKg8WiWVzP_lE2K5C3C-D8_9J8x_X2';
+const PLAYLISTS = {
+  // Playlist 1: Aufrufbar via ?playlist=fruehling
+  fruehling: {
+    themeName: 'Frühling',
+    tracks: [
+      {
+        id: 'L4u_5jC1ZGE', // YouTube Video-ID
+        eyebrow: 'Karneval der Tiere',
+        title: 'Die Vögel',
+        composer: 'Camille Saint-Saëns',
+      },
+      {
+        id: 'v2AC41dglnM',
+        eyebrow: 'Die vier Jahreszeiten',
+        title: 'Der Frühling',
+        composer: 'Antonio Vivaldi',
+      },
+    ],
+  },
+
+  // Playlist 2: Aufrufbar via ?playlist=weltall
+  weltall: {
+    themeName: 'Weltall',
+    tracks: [
+      {
+        id: 'dQw4w9WgXcQ',
+        eyebrow: 'Die Planeten',
+        title: 'Jupiter',
+        composer: 'Gustav Holst',
+      },
+    ],
+  },
+};
+
+// Fallback, falls kein Parameter in der URL steht
+const DEFAULT_PLAYLIST_KEY = 'fruehling';
+
+// ---------------------------------------------------------
+// QR-Code Parameter auslesen & Playlist bestimmen
+// ---------------------------------------------------------
+function getPlaylistKeyFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get('playlist');
+  return PLAYLISTS[key] ? key : DEFAULT_PLAYLIST_KEY;
+}
+
+const currentPlaylistKey = getPlaylistKeyFromUrl();
+const activePlaylist = PLAYLISTS[currentPlaylistKey];
+
+let currentIndex = 0;
+let player = null;
+let isPlaying = false;
+let progressTimer = null;
+let isSeeking = false;
 
 // ---------------------------------------------------------
 // DOM-Referenzen
@@ -28,23 +80,8 @@ const ICON_PLAY = '<path d="M8 5 L19 12 L8 19 Z" />';
 const ICON_PAUSE = '<path d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z" />';
 
 // ---------------------------------------------------------
-// QR-Code-Steuerung: ?playlist=YOUTUBE_PLAYLIST_ID lesen
+// YouTube API Initialisierung
 // ---------------------------------------------------------
-function getPlaylistIdFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get('playlist');
-}
-
-const activePlaylistId = getPlaylistIdFromUrl() || DEFAULT_PLAYLIST_ID;
-
-// ---------------------------------------------------------
-// YouTube IFrame API laden
-// ---------------------------------------------------------
-let player = null;
-let isPlaying = false;
-let progressTimer = null;
-let isSeeking = false;
-
 function loadYouTubeIframeAPI() {
   const tag = document.createElement('script');
   tag.src = 'https://www.youtube.com/iframe_api';
@@ -55,6 +92,7 @@ window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {
   player = new YT.Player('player', {
     height: '1',
     width: '1',
+    videoId: activePlaylist.tracks[currentIndex].id,
     playerVars: {
       autoplay: 0,
       controls: 0,
@@ -65,8 +103,6 @@ window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {
       rel: 0,
       iv_load_policy: 3,
       origin: window.location.origin,
-      listType: 'playlist',      // Sagt der API, dass es eine Playlist ist
-      list: activePlaylistId,    // Übergibt die Playlist-ID aus dem QR-Code
     },
     events: {
       onReady: handlePlayerReady,
@@ -76,22 +112,7 @@ window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {
 };
 
 function handlePlayerReady() {
-  updateMetadata();
-}
-
-function updateMetadata() {
-  try {
-    if (player && typeof player.getVideoData === 'function') {
-      const data = player.getVideoData();
-      if (data && data.title) {
-        elTitle.textContent = data.title;
-        elComposer.textContent = data.author || '';
-        if (elEyebrow) elEyebrow.textContent = 'Playlist';
-      }
-    }
-  } catch (err) {
-    // Falls Metadaten noch nicht verfügbar sind
-  }
+  renderTrackUI();
 }
 
 function handleStateChange(event) {
@@ -99,20 +120,19 @@ function handleStateChange(event) {
   renderPlayIcon();
 
   if (isPlaying) {
-    updateMetadata(); // Aktualisiert Titel & Komponist beim Songwechsel
     startProgressLoop();
   } else {
     stopProgressLoop();
   }
 
-  // Wenn ein Song zu Ende ist, springt die Playlist automatisch weiter
+  // Automatischer Wechsel zum nächsten Track bei Liedende
   if (event.data === YT.PlayerState.ENDED) {
-    resetProgress();
+    goToNext();
   }
 }
 
 // ---------------------------------------------------------
-// Wiedergabesteuerung
+// Steuerung
 // ---------------------------------------------------------
 function togglePlay() {
   if (!player || typeof player.getPlayerState !== 'function') return;
@@ -125,23 +145,38 @@ function togglePlay() {
 }
 
 function goToNext() {
-  if (player && typeof player.nextVideo === 'function') {
-    player.nextVideo(); // Befehl an YouTube: Nächster Titel der Playlist
-  }
+  currentIndex = (currentIndex + 1) % activePlaylist.tracks.length;
+  loadAndPlayCurrentTrack();
 }
 
 function goToPrev() {
-  if (player && typeof player.previousVideo === 'function') {
-    player.previousVideo(); // Befehl an YouTube: Vorheriger Titel der Playlist
+  currentIndex = (currentIndex - 1 + activePlaylist.tracks.length) % activePlaylist.tracks.length;
+  loadAndPlayCurrentTrack();
+}
+
+function loadAndPlayCurrentTrack() {
+  renderTrackUI();
+  resetProgress();
+  if (player && typeof player.loadVideoById === 'function') {
+    player.loadVideoById(activePlaylist.tracks[currentIndex].id);
   }
 }
 
 // ---------------------------------------------------------
-// UI-Rendering & Fortschritts-Anzeige
+// UI Rendering & Progress Bar
 // ---------------------------------------------------------
+function renderTrackUI() {
+  const track = activePlaylist.tracks[currentIndex];
+  
+  if (elThemeName) elThemeName.textContent = activePlaylist.themeName;
+  if (elEyebrow) elEyebrow.textContent = track.eyebrow || '';
+  if (elTitle) elTitle.textContent = track.title || '';
+  if (elComposer) elComposer.textContent = track.composer || '';
+}
+
 function renderPlayIcon() {
-  elPlayIcon.innerHTML = isPlaying ? ICON_PAUSE : ICON_PLAY;
-  elPlayBtn.setAttribute('aria-label', isPlaying ? 'Pausieren' : 'Abspielen');
+  if (elPlayIcon) elPlayIcon.innerHTML = isPlaying ? ICON_PAUSE : ICON_PLAY;
+  if (elPlayBtn) elPlayBtn.setAttribute('aria-label', isPlaying ? 'Pausieren' : 'Abspielen');
 }
 
 function formatTime(seconds) {
@@ -152,18 +187,16 @@ function formatTime(seconds) {
 }
 
 function resetProgress() {
-  elProgressFill.style.width = '0%';
-  elProgressHandle.style.left = '0%';
-  elTime.textContent = '0:00';
-  elProgressTrack.setAttribute('aria-valuenow', '0');
+  if (elProgressFill) elProgressFill.style.width = '0%';
+  if (elProgressHandle) elProgressHandle.style.left = '0%';
+  if (elTime) elTime.textContent = '0:00';
 }
 
 function updateProgressUI(ratio, currentSeconds) {
   const percent = Math.min(100, Math.max(0, ratio * 100));
-  elProgressFill.style.width = `${percent}%`;
-  elProgressHandle.style.left = `${percent}%`;
-  elTime.textContent = formatTime(currentSeconds);
-  elProgressTrack.setAttribute('aria-valuenow', String(Math.round(percent)));
+  if (elProgressFill) elProgressFill.style.width = `${percent}%`;
+  if (elProgressHandle) elProgressHandle.style.left = `${percent}%`;
+  if (elTime) elTime.textContent = formatTime(currentSeconds);
 }
 
 function startProgressLoop() {
@@ -185,7 +218,7 @@ function stopProgressLoop() {
 }
 
 // ---------------------------------------------------------
-// Fortschrittsleiste: Klick & Drag zum Spulen
+// Spulen (Seek) Event-Handling
 // ---------------------------------------------------------
 function seekFromClientX(clientX) {
   if (!player || typeof player.getDuration !== 'function') return;
@@ -196,40 +229,38 @@ function seekFromClientX(clientX) {
   return ratio * duration;
 }
 
-elProgressTrack.addEventListener('pointerdown', (event) => {
-  isSeeking = true;
-  elProgressTrack.setPointerCapture(event.pointerId);
-  seekFromClientX(event.clientX);
-});
+if (elProgressTrack) {
+  elProgressTrack.addEventListener('pointerdown', (event) => {
+    isSeeking = true;
+    elProgressTrack.setPointerCapture(event.pointerId);
+    seekFromClientX(event.clientX);
+  });
 
-elProgressTrack.addEventListener('pointermove', (event) => {
-  if (!isSeeking) return;
-  seekFromClientX(event.clientX);
-});
+  elProgressTrack.addEventListener('pointermove', (event) => {
+    if (!isSeeking) return;
+    seekFromClientX(event.clientX);
+  });
 
-function endSeek(event) {
-  if (!isSeeking) return;
-  isSeeking = false;
-  const target = seekFromClientX(event.clientX);
-  if (player && typeof player.seekTo === 'function' && typeof target === 'number') {
-    player.seekTo(target, true);
-  }
+  elProgressTrack.addEventListener('pointerup', (event) => {
+    if (!isSeeking) return;
+    isSeeking = false;
+    const target = seekFromClientX(event.clientX);
+    if (player && typeof player.seekTo === 'function' && typeof target === 'number') {
+      player.seekTo(target, true);
+    }
+  });
+
+  elProgressTrack.addEventListener('pointercancel', () => {
+    isSeeking = false;
+  });
 }
 
-elProgressTrack.addEventListener('pointerup', endSeek);
-elProgressTrack.addEventListener('pointercancel', () => {
-  isSeeking = false;
-});
+// Event-Listener für Buttons
+if (elPlayBtn) elPlayBtn.addEventListener('click', togglePlay);
+if (elPrevBtn) elPrevBtn.addEventListener('click', goToPrev);
+if (elNextBtn) elNextBtn.addEventListener('click', goToNext);
 
-// ---------------------------------------------------------
-// Button-Events
-// ---------------------------------------------------------
-elPlayBtn.addEventListener('click', togglePlay);
-elPrevBtn.addEventListener('click', goToPrev);
-elNextBtn.addEventListener('click', goToNext);
-
-// ---------------------------------------------------------
-// Initialisierung
-// ---------------------------------------------------------
+// Start
+renderTrackUI();
 renderPlayIcon();
 loadYouTubeIframeAPI();
