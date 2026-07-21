@@ -1,26 +1,12 @@
 // =========================================================
-// klimper Player – App-Logik
+// klimper Player – App-Logik (Unterstützt YouTube Playlists)
 // =========================================================
 
 // ---------------------------------------------------------
-// Standard-Playlist (Fallback, falls kein ?track=-Parameter
-// in der URL steht). ACHTUNG: Platzhalter-IDs, bitte durch
-// echte YouTube-Video-IDs ersetzen.
+// Standard-Playlist ID (Fallback, falls kein ?playlist= Parameter in der URL steht)
+// Ersetze diese ID durch deine gewünschte YouTube-Playlist-ID!
 // ---------------------------------------------------------
-const DEFAULT_PLAYLIST = [
-  {
-    id: 'HP5xhyPn58U',
-    eyebrow: 'Die Planeten',
-    title: 'Merkur',
-    composer: 'Gustav Holst',
-  },
-  {
-    id: 'Yo98PdmGzvo',
-    eyebrow: 'Interstellar',
-    title: 'Cornfield Chase',
-    composer: 'Hans Zimmer',
-  },
-];
+const DEFAULT_PLAYLIST_ID = 'PLDISKg8WiWVzP_lE2K5C3C-D8_9J8x_X2';
 
 // ---------------------------------------------------------
 // DOM-Referenzen
@@ -42,23 +28,14 @@ const ICON_PLAY = '<path d="M8 5 L19 12 L8 19 Z" />';
 const ICON_PAUSE = '<path d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z" />';
 
 // ---------------------------------------------------------
-// QR-Code-Steuerung: ?track=YOUTUBE_ID aus der URL lesen
+// QR-Code-Steuerung: ?playlist=YOUTUBE_PLAYLIST_ID lesen
 // ---------------------------------------------------------
-function getTrackIdFromUrl() {
+function getPlaylistIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  return params.get('track');
+  return params.get('playlist');
 }
 
-const trackIdFromUrl = getTrackIdFromUrl();
-
-// Wenn ein Track per QR-Parameter vorgegeben ist, wird er vorangestellt
-// und direkt abgespielt. Titel/Komponist sind zunächst unbekannt und
-// werden – soweit möglich – aus den YouTube-Metadaten übernommen.
-let playlist = trackIdFromUrl
-  ? [{ id: trackIdFromUrl, eyebrow: '', title: 'Wird geladen …', composer: '' }, ...DEFAULT_PLAYLIST]
-  : [...DEFAULT_PLAYLIST];
-
-let currentIndex = 0;
+const activePlaylistId = getPlaylistIdFromUrl() || DEFAULT_PLAYLIST_ID;
 
 // ---------------------------------------------------------
 // YouTube IFrame API laden
@@ -74,12 +51,10 @@ function loadYouTubeIframeAPI() {
   document.head.appendChild(tag);
 }
 
-// Von der YouTube-API global erwarteter Callback-Name
 window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {
   player = new YT.Player('player', {
     height: '1',
     width: '1',
-    videoId: playlist[currentIndex].id,
     playerVars: {
       autoplay: 0,
       controls: 0,
@@ -90,6 +65,8 @@ window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {
       rel: 0,
       iv_load_policy: 3,
       origin: window.location.origin,
+      listType: 'playlist',      // Sagt der API, dass es eine Playlist ist
+      list: activePlaylistId,    // Übergibt die Playlist-ID aus dem QR-Code
     },
     events: {
       onReady: handlePlayerReady,
@@ -99,23 +76,21 @@ window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {
 };
 
 function handlePlayerReady() {
-  if (trackIdFromUrl) {
-    tryAdoptVideoMetadata();
-  }
+  updateMetadata();
 }
 
-// player.getVideoData() ist Teil der IFrame API, aber nicht offiziell
-// dokumentiert – daher defensiv mit try/catch verwendet.
-function tryAdoptVideoMetadata() {
+function updateMetadata() {
   try {
-    const data = player.getVideoData && player.getVideoData();
-    if (data && data.title) {
-      playlist[currentIndex].title = data.title;
-      playlist[currentIndex].composer = data.author || '';
-      renderTrack();
+    if (player && typeof player.getVideoData === 'function') {
+      const data = player.getVideoData();
+      if (data && data.title) {
+        elTitle.textContent = data.title;
+        elComposer.textContent = data.author || '';
+        if (elEyebrow) elEyebrow.textContent = 'Playlist';
+      }
     }
   } catch (err) {
-    // Metadaten nicht verfügbar – Anzeige bleibt beim Platzhalter.
+    // Falls Metadaten noch nicht verfügbar sind
   }
 }
 
@@ -124,13 +99,15 @@ function handleStateChange(event) {
   renderPlayIcon();
 
   if (isPlaying) {
+    updateMetadata(); // Aktualisiert Titel & Komponist beim Songwechsel
     startProgressLoop();
   } else {
     stopProgressLoop();
   }
 
+  // Wenn ein Song zu Ende ist, springt die Playlist automatisch weiter
   if (event.data === YT.PlayerState.ENDED) {
-    goToNext();
+    resetProgress();
   }
 }
 
@@ -148,35 +125,20 @@ function togglePlay() {
 }
 
 function goToNext() {
-  currentIndex = (currentIndex + 1) % playlist.length;
-  playCurrentTrack();
+  if (player && typeof player.nextVideo === 'function') {
+    player.nextVideo(); // Befehl an YouTube: Nächster Titel der Playlist
+  }
 }
 
 function goToPrev() {
-  currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-  playCurrentTrack();
-}
-
-function playCurrentTrack() {
-  renderTrack();
-  resetProgress();
-  if (player && typeof player.loadVideoById === 'function') {
-    player.loadVideoById(playlist[currentIndex].id);
+  if (player && typeof player.previousVideo === 'function') {
+    player.previousVideo(); // Befehl an YouTube: Vorheriger Titel der Playlist
   }
 }
 
 // ---------------------------------------------------------
-// UI-Rendering
+// UI-Rendering & Fortschritts-Anzeige
 // ---------------------------------------------------------
-function renderTrack() {
-  const track = playlist[currentIndex];
-  elEyebrow.textContent = track.eyebrow;
-  elEyebrow.style.display = track.eyebrow ? '' : 'none';
-  elTitle.textContent = track.title;
-  elComposer.textContent = track.composer;
-  elComposer.style.display = track.composer ? '' : 'none';
-}
-
 function renderPlayIcon() {
   elPlayIcon.innerHTML = isPlaying ? ICON_PAUSE : ICON_PLAY;
   elPlayBtn.setAttribute('aria-label', isPlaying ? 'Pausieren' : 'Abspielen');
@@ -269,6 +231,5 @@ elNextBtn.addEventListener('click', goToNext);
 // ---------------------------------------------------------
 // Initialisierung
 // ---------------------------------------------------------
-renderTrack();
 renderPlayIcon();
 loadYouTubeIframeAPI();
