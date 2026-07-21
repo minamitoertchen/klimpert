@@ -11,10 +11,10 @@ const PLAYLISTS = {
     themeName: 'Frühling',
     tracks: [
       {
-        url: 'assets/audio/schwan.mp3', // Pfad zu deiner MP3-Datei
-        eyebrow: 'Karneval der Tiere',
-        title: 'Der Schwan',
-        composer: 'Camille Saint-Saëns',
+        url: 'assets/audio/CuckooinSpring.mp3', // Pfad zu deiner MP3-Datei
+        eyebrow: 'On hearing the first Cuckoo in Spring',
+        title: 'On hearing the first Cuckoo in Spring',
+        composer: 'Frederick Delius',
       },
       {
         url: 'assets/audio/voegel.mp3',
