@@ -9,16 +9,16 @@
 // ---------------------------------------------------------
 const DEFAULT_PLAYLIST = [
   {
-    id: 'REPLACE_WITH_YOUTUBE_ID_1',
-    eyebrow: 'Karneval der Tiere',
-    title: 'Die Vögel',
-    composer: 'Camille Saint-Saëns',
+    id: 'HP5xhyPn58U',
+    eyebrow: 'Die Planeten',
+    title: 'Merkur',
+    composer: 'Gustav Holst',
   },
   {
-    id: 'REPLACE_WITH_YOUTUBE_ID_2',
-    eyebrow: 'Karneval der Tiere',
-    title: 'Der Schwan',
-    composer: 'Camille Saint-Saëns',
+    id: 'Yo98PdmGzvo',
+    eyebrow: 'Interstellar',
+    title: 'Cornfield Chase',
+    composer: 'Hans Zimmer',
   },
 ];
 
