@@ -32,7 +32,7 @@ const PLAYLISTS = {
       },
     ],
   },
-  
+
   vivaldifruehling: {
     themeName: 'Frühling',
     tracks: [
@@ -181,7 +181,7 @@ const PLAYLISTS = {
 
   // 🪐 PLANETEN (?playlist=planeten)
   planeten: {
-    themeName: 'Die Planeten',
+    themeName: 'Weltall',
     tracks: [
       {
         url: "assets/audio/planeten/Holst： The Planets, Op. 32： I. Mars, The Bringer of War.mp3",
