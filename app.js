@@ -6,6 +6,19 @@
 // DEINE PLAYLISTS & MP3-DATEIEN
 // ---------------------------------------------------------
 const PLAYLISTS = {
+
+  laprimavera: {
+    themeName: 'La Primavera',
+    tracks: [
+      {
+        url: "assets/audio/der fruehling/Trittico Botticelliano： No. 1, La Primavera.mp3",
+        eyebrow: 'Trittico Botticelliano',
+        title: 'La Primavera (Nr. 1)',
+        composer: 'Ottorino Respighi',
+      },
+    ],
+  },
+  
   // 🌸 FRÜHLING (?playlist=fruehling)
   fruehling: {
     themeName: 'Frühling',
