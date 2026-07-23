@@ -7,6 +7,32 @@
 // ---------------------------------------------------------
 const PLAYLISTS = {
 
+  // ⚔️ STAR WARS (?playlist=starwars)
+  starwars: {
+    themeName: 'Weltall',
+    tracks: [
+      {
+        url: "assets/audio/science fiction/John Williams & Vienna Philharmonic – Williams： Imperial March (from “Star Wars”).mp3",
+        eyebrow: 'Star Wars',
+        title: 'The Imperial March',
+        composer: 'John Williams',
+      },
+    ],
+  },
+
+  // 🌌 ALSO SPRACH ZARATHUSTRA (?playlist=zarathustra)
+  zarathustra: {
+    themeName: 'Weltall',
+    tracks: [
+      {
+        url: "assets/audio/science fiction/Strauss： Also sprach Zarathustra ⧸ Dudamel · Berliner Philharmoniker.mp3",
+        eyebrow: '2001: Odyssee im Weltraum',
+        title: 'Also sprach Zarathustra',
+        composer: 'Richard Strauss',
+      },
+    ],
+  },
+  
   vivaldifruehling: {
     themeName: 'Frühling',
     tracks: [
