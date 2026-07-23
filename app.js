@@ -7,6 +7,18 @@
 // ---------------------------------------------------------
 const PLAYLISTS = {
 
+  vivaldifruehling: {
+    themeName: 'Frühling',
+    tracks: [
+      {
+        url: "assets/audio/der fruehling/Vivaldi Four Seasons： Spring (La Primavera) Full, original. Youssefian & Voices of Music RV 269 4K.mp3",
+        eyebrow: 'Die vier Jahreszeiten',
+        title: 'Der Frühling (La Primavera)',
+        composer: 'Antonio Vivaldi',
+      },
+    ],
+  },
+
   laprimavera: {
     themeName: 'Frühling',
     tracks: [
