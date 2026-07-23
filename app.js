@@ -8,7 +8,7 @@
 const PLAYLISTS = {
 
   laprimavera: {
-    themeName: 'La Primavera',
+    themeName: 'Frühling',
     tracks: [
       {
         url: "assets/audio/der fruehling/Trittico Botticelliano： No. 1, La Primavera.mp3",
@@ -18,7 +18,7 @@ const PLAYLISTS = {
       },
     ],
   },
-  
+
   // 🌸 FRÜHLING (?playlist=fruehling)
   fruehling: {
     themeName: 'Frühling',
@@ -192,7 +192,7 @@ const PLAYLISTS = {
 
   // 👾 SCIENCE FICTION (?playlist=scifi)
   scifi: {
-    themeName: 'Science Fiction',
+    themeName: 'Weltall',
     tracks: [
       {
         url: "assets/audio/science fiction/Interstellar Official Soundtrack ｜ Cornfield Chase – Hans Zimmer ｜ WaterTower.mp3",
@@ -229,7 +229,7 @@ const PLAYLISTS = {
 
   // 🕊️ VÖGEL (?playlist=voegel)
   voegel: {
-    themeName: 'Vogelstimmen',
+    themeName: 'Frühling',
     tracks: [
       {
         url: "assets/audio/voegel/Carnival of the Animals： IX. The Cuckoo in the Depths of the Woods.mp3",
@@ -266,7 +266,7 @@ const PLAYLISTS = {
 
   // 🎻 VIVALDI (?playlist=vivaldi)
   vivaldi: {
-    themeName: 'Antonio Vivaldi',
+    themeName: 'Frühling',
     tracks: [
       {
         url: "assets/audio/Vivaldi/Vivaldi： The Four Seasons ⧸ Violin Concerto in G Minor, RV 315 'Summer'： III. Presto.mp3",
@@ -309,7 +309,7 @@ const PLAYLISTS = {
 
   // 🎨 IMPRESSIONISMUS (?playlist=impressionismus)
   impressionismus: {
-    themeName: 'Impressionismus',
+    themeName: 'Frühling',
     tracks: [
       {
         url: "assets/audio/Impressionismus/Seong-Jin Cho – Debussy Suite bergamasque, L.75 III. Clair de lune - Deutsche Grammophon - DG (128k).mp3",
@@ -352,7 +352,7 @@ const PLAYLISTS = {
 
   // ⭐️ HOROSKOP (?playlist=horoskop)
   horoskop: {
-    themeName: 'Horoskop',
+    themeName: 'Weltall',
     tracks: [
       {
         url: "assets/audio/horoskop/Debussy： Clair de lune ｜ Menahem Pressler, piano.mp3",
@@ -431,7 +431,7 @@ const PLAYLISTS = {
 
   // 🎼 SCHERZO (?playlist=scherzo)
   scherzo: {
-    themeName: 'Scherzo',
+    themeName: 'Frühling',
     tracks: [
       {
         url: "assets/audio/Scherzo/Klavierquintett in A-Dur, D.667： III. Scherzo Presto Trio.mp3",
@@ -468,7 +468,7 @@ const PLAYLISTS = {
 
   // 🪕 THEREMIN (?playlist=theremin)
   theremin: {
-    themeName: 'Theremin Klänge',
+    themeName: 'Weltall',
     tracks: [
       {
         url: "assets/audio/theremin/Fantasia for Theremin, Oboe, String Quartet, and Piano ｜ B. Martinů.mp3",
@@ -499,7 +499,7 @@ const PLAYLISTS = {
 
   // 🎻 QUARTETT FRÜHLING (?playlist=quartettfruehling)
   quartettfruehling: {
-    themeName: 'Quartett Frühling',
+    themeName: 'Frühling',
     tracks: [
       {
         url: "assets/audio/quartettfrühling/Vienna Philharmonic & Zubin Mehta - Grieg Morning Mood (Summer Night Concert 2015) - Sony Classical (128k).mp3",
@@ -530,7 +530,7 @@ const PLAYLISTS = {
 
   // 🌊 DIE MOLDAU (?playlist=moldau)
   moldau: {
-    themeName: 'Die Moldau',
+    themeName: 'Frühling',
     tracks: [
       {
         url: "assets/audio/Smetana ~ Moldau.mp3",
@@ -556,7 +556,7 @@ const PLAYLISTS = {
 
   // 🌌 JOHN CAGE (?playlist=johncage)
   johncage: {
-    themeName: 'Neue Musik',
+    themeName: 'Weltall',
     tracks: [
       {
         url: "assets/audio/John Cage： Atlas Eclipticalis (1962).mp3",
